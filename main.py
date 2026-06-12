@@ -1,33 +1,41 @@
 import streamlit as st
-import json
 from openai import OpenAI
 
-# API Key management
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-st.set_page_config(page_title="Sales-Gen AI SaaS", layout="wide")
-st.title("🚀 Sales-Driven Marketing Engine")
+st.set_page_config(page_title="Sales-Gen Pro", layout="wide")
+st.title("🚀 Sales-Driven Marketing Engine Pro")
 
-product_desc = st.text_area("Product ya Offer ka details yahan likhein:")
+product_url = st.text_input("Promote karne ke liye Product ya Website ka Link dein:")
 
-if st.button("Generate Sales Assets"):
-    with st.spinner('Generating content and visuals...'):
-        prompt = f"Act as an elite marketer. Create sales-driven strategy for: {product_desc}. Respond in valid JSON format with pinterest_strategy, instagram_facebook_strategy, and a 30-day sales roadmap."
-        
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
-        # JSON output handle karna
-        output = response.choices[0].message.content
-        st.subheader("Marketing Strategy (JSON)")
-        st.json(output)
-        
-        # Image Generation
-        st.subheader("Sales-Driven Visual")
-        img_prompt = f"Professional ad design for {product_desc}, high conversion, clean, modern, clear CTA."
-        img_response = client.images.generate(model="dall-e-3", prompt=img_prompt, n=1, size="1024x1024")
-        
-        # Fixed image line
-        st.image(img_response.data[0].url)
+if st.button("Generate Full Sales Strategy"):
+    if not product_url:
+        st.warning("Link provide karein!")
+    else:
+        with st.spinner('Generating SEO & Social Assets for all platforms...'):
+            
+            # Marketing Logic
+            prompt = f"""
+            Analyze {product_url} for high-conversion sales. Provide:
+            1. PINTEREST: 3 Pin titles/descriptions (SEO optimized), 3 specific DALL-E image prompts for pins.
+            2. INSTAGRAM: SEO keyword set, 3 Carousel post contents with viral hashtags, 3 DALL-E image prompts.
+            3. FACEBOOK: Sales-copy post, SEO-optimized headline, 3 DALL-E image prompts.
+            """
+            
+            response = client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": prompt}]
+            )
+            
+            strategy = response.choices[0].message.content
+            st.markdown(strategy)
+            
+            # Automated Image Generation per platform
+            platforms = ["Pinterest Ad", "Instagram Post", "Facebook Ad"]
+            for platform in platforms:
+                st.subheader(f"Generating Image for: {platform}")
+                img_prompt = f"High conversion {platform} for {product_url}, professional design, clear CTA, sales focused."
+                img_res = client.images.generate(model="dall-e-3", prompt=img_prompt, n=1, size="1024x1024")
+                st.image(img_res.data[0].url, caption=f"Visual for {platform}")
+
+st.success("Strategy aur Creative Assets ready hain!")
