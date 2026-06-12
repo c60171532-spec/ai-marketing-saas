@@ -1,16 +1,26 @@
 import streamlit as st
 import google.generativeai as genai
 
-# Gemini Setup
+# API Setup
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 model = genai.GenerativeModel('gemini-1.5-flash')
 
-st.title("🚀 Free Sales-Driven AI Engine")
+# App UI
+st.title("🚀 Sales-Driven Marketing Engine")
+product_url = st.text_input("Product ka link yahan daalein:")
 
-product_url = st.text_input("Product Link:")
-
-if st.button("Generate Free Strategy"):
-    with st.spinner('Generating...'):
-        prompt = f"Analyze {product_url} for sales. Provide SEO keywords, Pinterest/Insta/FB post ideas for high sales."
-        response = model.generate_content(prompt)
-        st.write(response.text)
+if st.button("Generate Strategy"):
+    if product_url:
+        with st.spinner('AI Marketing strategy bana raha hai...'):
+            # Prompt ko aur behter banaya taake wo sales par focus kare
+            prompt = f"""
+            Aap ek professional digital marketer hain. Is product link ko analyze karein: {product_url}.
+            Mujhe in teeno cheezon ke liye sales-focused plan dein:
+            1. Pinterest: 3 Pin titles aur descriptions (SEO tags ke saath).
+            2. Instagram: 3 engaging posts aur hashtags.
+            3. Facebook: Ek sales-driving ad copy.
+            """
+            response = model.generate_content(prompt)
+            st.markdown(response.text)
+    else:
+        st.warning("Please link enter karein!")
